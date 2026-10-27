@@ -41,7 +41,19 @@ microphone -> host laptop (Windows/Linux)
           -> local alert panel + local encrypted session folder              <- quietroom/summary.py interface
 ```
 
-In Stage I, speech-to-text input is the scripted transcript and the summary is rule-based.
+### Stage I speech-to-text baseline (CPU)
+
+`scripts/measure_asr.py` voices every turn with offline synthetic voices (Kokoro), transcribes it on the laptop CPU
+with Whisper base.en int8 (sherpa-onnx) and writes `demo/session_en_asr.json`. Measured on 27.10.2026:
+**word error rate 1.9%** (4/207 words, synthetic voices) and **real-time factor 0.24** (64.6 s of audio in 15.7 s).
+Alerts computed from the speech-to-text output are identical to those computed from the reference script.
+
+```
+pip install kokoro-onnx sherpa-onnx soundfile numpy
+python scripts/measure_asr.py --kokoro kokoro-v1.0.onnx --voices voices-v1.0.bin --whisper sherpa-onnx-whisper-base.en
+```
+
+In Stage I the summary is rule-based.
 In Stage II (06.11-04.12) both are moved to UGen300 via HailoRT, with models chosen from those supported on Hailo-10H.
 
 ## Stage II plan and what we will measure
